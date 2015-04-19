@@ -1,11 +1,16 @@
-# JS Skeleton Project
+# Fitscape
 
 ## About
 
-This is a basic one-page JavaScript project which uses `bower` and `npm` for
-package management, `stylus` for CSS, `browserify` for JavaScript
-modules/dependencies, `jasmin` for tests, `jshint` for code quality enforcement,
-and `jake` for building and tasks (instead of `gulp` or `grunt`).
+Fitscape is a simple genetic algorithm that you can play around with. It will
+show you virutal organisms that evolve by mutation and natural selection.
+
+## Project details
+
+This project uses `bower` and `npm` for package management, `stylus` for CSS,
+`browserify` for JavaScript modules/dependencies, `jasmin` for tests, `jshint`
+for code quality enforcement, and `jake` for building and tasks (instead of
+`gulp` or `grunt`).
 
 ## Getting started
 
@@ -36,5 +41,5 @@ and `jake` for building and tasks (instead of `gulp` or `grunt`).
 
 ## TODO
 
- * Use `file` tasks for compiling JS and CSS
- * Make this into a `yeoman` recipe, or whatever those are called?
+ * Start using react!
+ * Add in the basic genetic algorithm
