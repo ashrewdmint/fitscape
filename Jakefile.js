@@ -83,6 +83,19 @@ namespace('build', function () {
     }));
   });
 
+  task('workers', [BUILD, 'hint'], function () {
+    log('Processing workers...');
+    jake.mkdirP('build/workers');
+
+    var workers = ['simulation'];
+
+    workers.forEach(function (name) {
+      name = name+'-worker';
+      jake.npmExec('browserify src/script/workers/'+name+'.js '+
+                   '-t strictify -o build/workers/'+name+'.js');
+    });
+  });
+
   desc('Packages all styles into bundle.css');
   task('style', [BUILD], function () {
     log('Processing styles...');
@@ -102,7 +115,7 @@ namespace('build', function () {
   });
 
   desc('Performs all build tasks');
-  task('all', ['index', 'script', 'style'], function () {
+  task('all', ['index', 'script', 'workers', 'style'], function () {
     if (isDev()) {
       log(BUILD+'/ is ready!');
       return;
@@ -146,9 +159,9 @@ task('server', ['build:all'], function () {
       server, lr;
 
   if (dev) {
-    lr = livereload.createServer();
-    lr.watch(dir);
-    log('Livereload running');
+    // lr = livereload.createServer();
+    // lr.watch(dir);
+    // log('Livereload running');
     jake.Task.watch.invoke();
   }
 
@@ -158,7 +171,7 @@ task('server', ['build:all'], function () {
       if (!data) { next(); return; }
       var html = data.toString(), inj;
 
-      if (dev) {
+      if (dev && false) {
         inj = '<script src="http://localhost:35729/livereload.js"></script>';
         html = data.toString().replace(/(<\/head>)/, inj+'$1');
       }

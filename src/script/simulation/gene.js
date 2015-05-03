@@ -57,11 +57,17 @@ _.extend(Gene.prototype, {
   },
 
   getValue: function (v) {
+    if (this.wrap) return this.min+(v+this.min) % (this.max-this.min);
     return Math.round(Math.min(Math.max(this.min, v), this.max));
   },
 
   withValue: function (value) {
     return _.extend({}, this, {value: value});
+  },
+
+  wrap: function (value) {
+    this.wrap = value;
+    return this;
   }
 });
 

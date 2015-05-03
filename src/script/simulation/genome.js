@@ -5,7 +5,7 @@ function Genome (genes) {
   this.genes = genes || Genome.defaultGenes;
 }
 
-Genome.HueGene   = new Gene('hue', 0, 359); // TODO .wrap(true) ?
+Genome.HueGene   = new Gene('hue', 0, 359).wrap(true);
 Genome.SatGene   = new Gene('sat', 0, 100);
 Genome.SizeGene  = new Gene('size', 1, 10);
 

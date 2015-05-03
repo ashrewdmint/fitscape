@@ -1,74 +1,63 @@
 var _              = require('underscore'),
     React          = require('react'),
-    GridVisualizer = require('./visualizers/grid');
+    Simulation     = require('./simulation/simulation'),
+    GridVisualizer = require('./visualizers/grid-visualizer');
 
-// var gv = new GridVisualizer();
-// gv.callback = function (grid, sim) {
-//   return [sim.population.length, grid.length];
-// };
+var simWorker = Simulation.async({
+  speed: 0.5,
+  mutationRate: 0.3,
+  mutationSpread: 5,
+  maxPopulation: 500,
+  initialPopulation: 1,
+  pDivideFit: 0.5,
+  pDivideUnfit: 0.001,
+  maxTime: 20000
+});
+
+// simWorker.on('divide', function (data) {
+//   console.log('something divided!', data.parent);
+// });
+// 
+// simWorker.on('update', function (data) {
+//   console.log('pop size', data.population.length);
+// });
+// 
+// simWorker.on('die', function (data) {
+//   console.log('deaths :-(', data.ids);
+// });
+
+var gv = new GridVisualizer(simWorker);
+simWorker.start();
 
 var GridComponent = React.createClass({
   getInitialState: function () {
-    return { cells: [], cols: 0, rows: 0 };
+    return { cells: [], sideLength: gv.grid.getSideLength() };
   },
 
   componentDidMount: function () {
-    var gv = new GridVisualizer({
-                  speed: 1,
-                  mutationRate: 0.3,
-                  mutationSpread: 5,
-                  maxPopulation: 100,
-                  pDivideFit: 1.0,
-                  pDivideUnfit: 0.001
-                }),
-        self = this, cells, cols, rows, minX, maxX, minY, maxY;
+    var self = this;
 
-    gv.callback = function () {
-      cells = []; cols = []; rows = [];
-      maxX = 0; minX = null; maxY = 0; minY = null;
-      gv.loopGrid(function (organism, x, y) {
-        if (!organism) { return; }
-        if (!minX) { minX = x; }
-        if (!minY) { minY = y; }
-        if (x < minX) { minX = x; }
-        if (y < minY) { minY = y; }
-        if (x > maxX) { maxX = x; }
-        if (y > maxY) { maxY = y; }
-
-        cols.push(x);
-        rows.push(y);
-
+    setInterval(function () {
+      var cells = [];
+      gv.grid.each(function (obj) {
+        var org = obj.value;
         cells.push({
-          x: x,
-          y: y,
-          hue: organism.genome.get('hue').value,
-          sat: organism.genome.get('sat').value
+          x: obj.x,
+          y: obj.y,
+          hue: org.genome.get('hue').value,
+          sat: org.genome.get('sat').value
         });
       });
 
-      self.setState({
-        cells: cells,
-        cols: _.uniq(cols).length,
-        rows: _.uniq(rows).length,
-        minX: minX,
-        minY: minY
-      });
-    };
+      self.setState({ cells: cells });
+    }, 500);
 
-    gv.start();
+    console.log('component mounted, time to start the grid visualizer');
   },
 
   render: function () {
-    var w = window.outerWidth/(this.state.cols+1);
-    var h = window.outerHeight/(this.state.rows+1);
-    var minX = this.state.minX;
-    var minY = this.state.minY;
-
-    w = 10;
-    h = 10;
-
-    minX = 0;
-    minY = 0;
+    var w = Math.max(Math.floor(window.innerWidth/(this.state.sideLength)), 1),
+        h = Math.max(Math.floor(window.innerHeight/(this.state.sideLength)), 1);
 
     var cells = _.map(this.state.cells, function (cell, i) {
       var color = [cell.hue, cell.sat+'%', '50%'].join(', ');
@@ -79,8 +68,8 @@ var GridComponent = React.createClass({
           width: w+'px',
           height: h+'px',
           position: 'absolute',
-          top: (cell.y-minY)*w+'px',
-          left: (cell.x-minX)*h+'px',
+          top: cell.y*h+'px',
+          left: cell.x*w+'px',
           backgroundColor: 'hsl('+color+')',
         }
       });
@@ -90,8 +79,9 @@ var GridComponent = React.createClass({
   }
 });
 
-
 React.render(
   <GridComponent />,
   document.getElementById('root')
 );
+
+console.log('hello, world!');

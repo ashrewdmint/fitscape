@@ -26,6 +26,7 @@
     "watchy": "^0.6.2"
   },
   "dependencies": {
+    "asEvented": "^0.4.3",
     "react": "^0.13.2",
     "underscore": "^1.8.3"
   }
